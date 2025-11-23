@@ -1,23 +1,20 @@
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom'; // useNavigate ekledik
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import RestaurantList from './components/RestaurantList';
 import ProductList from './components/ProductList';
 import CartPage from './components/CartPage';
 import AdminPanel from './components/AdminPanel';
 import LoginPage from './components/LoginPage';
+import OrderHistory from './components/OrderHistory'; // 👈 YENİ: İmport ettik
 import { CartProvider, useCart } from './context/CartContext'; 
 
-// Navbar'ı ayrı bir bileşen olarak tanımlıyoruz ki içindeki kancaları (hooks) kullanabilelim
 function Navbar() {
   const { cart } = useCart(); 
-  const navigate = useNavigate(); // Sayfa değiştirmek için
+  const navigate = useNavigate();
   
-  // Giriş yapmış kullanıcı var mı?
   const user = JSON.parse(localStorage.getItem('user'));
 
   const handleLogout = () => {
-    // 1. Hafızayı sil
     localStorage.removeItem('user');
-    // 2. Sayfayı yenile (En temizi budur, sepeti vs sıfırlar)
     window.location.href = '/';
   };
   
@@ -33,15 +30,12 @@ function Navbar() {
       borderRadius: '0 0 10px 10px',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
     }}>
-      {/* LOGO */}
       <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}>
         🍕 YEMEK SEPETİM
       </Link>
       
-      {/* SAĞ TARAF (Menü Linkleri) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         
-        {/* SEPET (Her zaman görünür) */}
         <Link to="/cart" style={{ textDecoration: 'none', color: 'white' }}>
             <div style={{ fontSize: '16px', fontWeight: 'bold', border: '1px solid white', padding: '5px 15px', borderRadius: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: '0.3s' }}>
                 🛒 Sepet 
@@ -49,13 +43,15 @@ function Navbar() {
             </div>
         </Link>
 
-        {/* KULLANICI DURUMUNA GÖRE DEĞİŞEN KISIM */}
         {user ? (
-            // EĞER GİRİŞ YAPMIŞSA BUNLARI GÖSTER
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <span style={{ fontWeight: 'bold' }}>👤 {user.name}</span>
                 
-                {/* Eğer Patron ise Admin Paneli Linki Çıksın */}
+                {/* 👇 YENİ: MÜŞTERİ İSE SİPARİŞLERİM LİNKİ */}
+                {user.role === 'Customer' && (
+                    <Link to="/my-orders" style={{ color: 'white', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}>📦 Siparişlerim</Link>
+                )}
+
                 {user.role === 'RestaurantOwner' && (
                     <Link to="/admin" style={{ color: 'white', textDecoration: 'underline', fontSize: '14px' }}>Yönetim Paneli</Link>
                 )}
@@ -68,7 +64,6 @@ function Navbar() {
                 </button>
             </div>
         ) : (
-            // GİRİŞ YAPMAMIŞSA BUNU GÖSTER
             <Link to="/login" style={{ textDecoration: 'none' }}>
                 <button style={{ background: 'white', color: '#ff4d4d', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
                     🔑 Giriş Yap
@@ -93,6 +88,8 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminPanel />} />
+            {/* 👇 YENİ ROTA */}
+            <Route path="/my-orders" element={<OrderHistory />} />
           </Routes>
         </div>
       </BrowserRouter>

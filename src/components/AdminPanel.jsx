@@ -41,7 +41,6 @@ export default function AdminPanel() {
   const changeStatus = (orderId, newStatus) => {
       axios.put(`https://localhost:7197/api/Orders/UpdateStatus/${orderId}`, { status: newStatus })
         .then(() => {
-            // Ekranı yenilemeden sadece o siparişin durumunu güncelle (Hızlı görünür)
             const updatedOrders = orders.map(order => 
                 order.id === orderId ? { ...order, status: newStatus } : order
             );
@@ -50,11 +49,11 @@ export default function AdminPanel() {
         .catch(err => alert("Durum güncellenemedi: " + err));
   };
 
-  // ... (handleAdd ve handleDelete fonksiyonları aynı kalacak, burayı kısa tuttum) ...
   const handleAdd = () => {
     const newProduct = { ...form, price: parseFloat(form.price), restaurantId: user.restaurantId, categoryId: 1 };
     axios.post('https://localhost:7197/api/Products', newProduct).then(() => { loadMyData(); setForm({...form, name: '', price: '', description: ''}); });
   };
+
   const handleDelete = (id) => {
     if(window.confirm("Silmek istiyor musun?")) axios.delete(`https://localhost:7197/api/Products/${id}`).then(() => loadMyData());
   };
@@ -63,9 +62,10 @@ export default function AdminPanel() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>👋 Hoşgeldin, {user.name}</h2>
-        <button onClick={() => { localStorage.removeItem('user'); navigate('/login'); }} style={{ background: '#333', color: 'white', padding: '8px 15px', border: 'none', cursor: 'pointer' }}>Çıkış Yap</button>
+      
+      {/* ÜST BAŞLIK (BUTON KALDIRILDI) */}
+      <div style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>
+        <h2 style={{ margin: 0, color: '#333' }}>👋 Hoşgeldin, {user.name}</h2>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '20px' }}>
@@ -82,15 +82,15 @@ export default function AdminPanel() {
             
             <ul style={{ marginTop: '20px', maxHeight: '400px', overflowY: 'auto' }}>
                 {products.map(p => (
-                    <li key={p.id} style={{ borderBottom: '1px solid #ddd', padding: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                    <li key={p.id} style={{ borderBottom: '1px solid #ddd', padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{p.name} ({p.price} TL)</span>
-                        <button onClick={() => handleDelete(p.id)} style={{ background: 'red', color: 'white', border: 'none', padding: '2px 5px', cursor: 'pointer' }}>Sil</button>
+                        <button onClick={() => handleDelete(p.id)} style={{ background: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>Sil</button>
                     </li>
                 ))}
             </ul>
           </div>
 
-          {/* SAĞ: SİPARİŞ YÖNETİMİ (GÜNCELLENDİ 🌟) */}
+          {/* SAĞ: SİPARİŞ YÖNETİMİ */}
           <div>
               <h3>📦 Gelen Siparişler</h3>
               <div style={{ background: '#e3f2fd', padding: '15px', borderRadius: '10px', height: '600px', overflowY: 'auto' }}>
@@ -102,12 +102,10 @@ export default function AdminPanel() {
                             <span style={{ color: 'green', fontWeight: 'bold' }}>{order.totalAmount} TL</span>
                         </div>
 
-                        {/* Yemek İsimleri Buraya Geliyor */}
                         <div style={{ fontSize: '14px', color: '#555', marginBottom: '10px' }}>
                             🍽️ <b>İçerik:</b> {order.items.join(", ")}
                         </div>
 
-                        {/* Durum Değiştirme Kutusu */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f9f9f9', padding: '5px', borderRadius: '5px' }}>
                             <span style={{ fontSize: '14px' }}>Durum:</span>
                             <select 
@@ -117,7 +115,7 @@ export default function AdminPanel() {
                             >
                                 <option value="Bekleniyor...">⏳ Bekleniyor...</option>
                                 <option value="Hazırlanıyor">👨‍🍳 Hazırlanıyor</option>
-                                <option value="Yola Çıktı">🏍️Motor Yola Çıktı</option>
+                                <option value="Yola Çıktı">🏍️ Kurye Yola Çıktı</option>
                                 <option value="Teslim Edildi">✅ Teslim Edildi</option>
                                 <option value="İptal Edildi">❌ İptal Edildi</option>
                             </select>
