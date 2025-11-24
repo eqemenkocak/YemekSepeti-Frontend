@@ -11,8 +11,6 @@ export default function RestaurantList() {
     axios.get('https://localhost:7197/api/Restaurants')
       .then(response => {
         setRestaurants(response.data);
-        // Debug için konsola bakalım, puanlar geliyor mu?
-        console.log("Restoranlar:", response.data);
       })
       .catch(error => console.error("Hata oluştu:", error));
   }, []);
@@ -40,8 +38,6 @@ export default function RestaurantList() {
                  cursor: 'pointer',
                  backgroundColor: '#fff',
                  transition: 'transform 0.2s, box-shadow 0.2s',
-                 position: 'relative',
-                 overflow: 'hidden'
                }}
                onMouseOver={(e) => {
                    e.currentTarget.style.transform = 'translateY(-5px)';
@@ -58,8 +54,8 @@ export default function RestaurantList() {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <h3 style={{ margin: 0, color: '#2c3e50', fontSize: '1.4rem' }}>{rest.name}</h3>
                 
-                {/* Puan Varsa Göster, Yoksa 'Yeni' Yaz */}
-                {rest.averageScore > 0 ? (
+                {/* SADECE PUANI VARSA GÖSTER (YOKSA BOŞ KALIR) */}
+                {rest.averageScore > 0 && (
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -74,18 +70,6 @@ export default function RestaurantList() {
                         <span style={{ marginRight: '4px', color: '#ffc107' }}>★</span> 
                         {rest.averageScore.toFixed(1)}
                     </div>
-                ) : (
-                    <span style={{
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        fontSize: '0.7rem',
-                        padding: '4px 8px',
-                        borderRadius: '10px',
-                        fontWeight: 'bold',
-                        textTransform: 'uppercase'
-                    }}>
-                        Yeni
-                    </span>
                 )}
             </div>
 

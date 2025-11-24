@@ -15,7 +15,7 @@ export default function CartPage() {
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    // 👇 2. KONTROL: KULLANICI YOKSA UYAR VE LOGIN'E AT
+    // 👇 2. KONTROL: Fonksiyon içinde de güvenlik önlemi kalsın
     if (!user) {
         alert("Sipariş vermek için lütfen önce giriş yapın!");
         navigate('/login');
@@ -24,7 +24,7 @@ export default function CartPage() {
 
     // Backend'e gidecek veriyi hazırla
     const orderData = {
-        UserId: user.id, // 👈 ARTIK GERÇEK KULLANICI ID'Sİ
+        UserId: user.id, // Gerçek kullanıcı ID'si
         RestaurantId: cart[0].restaurantId, 
         ProductIds: cart.map(item => item.id),
         TotalAmount: totalAmount
@@ -88,12 +88,23 @@ export default function CartPage() {
                 🗑️ Sepeti Temizle
             </button>
             
-            <button 
-                onClick={handleCheckout}
-                style={{ padding: '10px 20px', background: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px' }}
-            >
-                ✅ Siparişi Tamamla
-            </button>
+            {/* --- DEĞİŞİKLİK BURADA: Kullanıcı Kontrollü Buton --- */}
+            {user ? (
+                <button 
+                    onClick={handleCheckout}
+                    style={{ padding: '10px 20px', background: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+                >
+                    ✅ Siparişi Tamamla
+                </button>
+            ) : (
+                <button 
+                    onClick={() => navigate('/login')}
+                    style={{ padding: '10px 20px', background: '#ffc107', color: '#333', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+                >
+                    🔒 Giriş Yapmalısın
+                </button>
+            )}
+            
         </div>
       </div>
     </div>
