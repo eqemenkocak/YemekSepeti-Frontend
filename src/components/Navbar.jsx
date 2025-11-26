@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import logoImg from '../assets/logo.png'; 
 
 export default function Navbar() {
   const { cart } = useCart();
   const navigate = useNavigate();
   
-  // Giriş yapan kullanıcıyı hafızadan oku
   const user = JSON.parse(localStorage.getItem('user'));
 
   const handleLogout = () => {
@@ -18,77 +18,107 @@ export default function Navbar() {
 
   return (
     <nav style={{ 
-      backgroundColor: '#ff4d4d', 
-      padding: '15px 40px', 
+      backgroundColor: '#ff0000', 
+      padding: '0 40px', 
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'center',
       color: 'white',
-      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
       position: 'sticky',
       top: 0,
-      zIndex: 1000
+      zIndex: 1000,
+      height: '100px', 
+      transition: 'height 0.3s'
     }}>
       
-      {/* SOL TARAF: LOGO */}
+      {/* LOGO KISMI */}
       <div 
         onClick={() => navigate('/')} 
-        style={{ fontSize: '24px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+        style={{ 
+            cursor: 'pointer', 
+            display: 'flex', 
+            alignItems: 'center',
+            height: '100%', 
+        }}
       >
-        🍕 YEMEK SEPETİM
+        <img 
+            src={logoImg} 
+            alt="TıklaYe Logo" 
+            style={{ 
+                height: '160px', 
+                marginTop: '-10px', 
+                width: 'auto',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                position: 'relative', 
+                zIndex: 1001 
+            }} 
+        />
       </div>
 
-      {/* SAĞ TARAF: SEPET VE KULLANICI */}
+      {/* SAĞ TARAF: MENÜLER */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         
-        {/* Sepet Butonu */}
         <button 
           onClick={() => navigate('/cart')}
           style={{ 
-            background: 'white', color: '#ff4d4d', border: 'none', padding: '8px 15px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px', transition: 'transform 0.2s'
+            background: 'white', color: '#ff0000', border: 'none', padding: '10px 20px', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
           }}
           onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
           onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
           🛒 Sepet 
-          <span style={{ background: '#ff4d4d', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '12px', marginLeft: '5px' }}>{cart.length}</span>
+          <span style={{ background: '#ff0000', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '14px', marginLeft: '2px' }}>{cart.length}</span>
         </button>
 
-        {/* KULLANICI BİLGİSİ */}
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             
-            {/* İsim ve Logo (Tıklayınca Profile gider) */}
             <div 
                 onClick={() => navigate('/profile')} 
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: '600', cursor: 'pointer', fontSize: '1.1em' }}
                 title="Profilimi Düzenle"
             >
-              <div style={{ width: '35px', height: '35px', background: 'white', color: '#ff4d4d', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', fontSize: '18px', border: '2px solid white' }}>
+              <div style={{ width: '40px', height: '40px', background: 'white', color: '#ff4d4d', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', fontSize: '20px', border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
                 {displayInitial}
               </div>
               <span>{displayName}</span>
             </div>
 
-            {/* 👇 GÜNCELLENEN KISIM: Restoran Sahibi DEĞİLSE Siparişlerimi Göster */}
             {user.role !== 'RestaurantOwner' && (
-               <button 
-                  onClick={() => navigate('/my-orders')}
-                  style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}
-               >
+               <button onClick={() => navigate('/my-orders')} style={{ background: 'transparent', border: '2px solid white', color: 'white', padding: '8px 15px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>
                  📦 Siparişlerim
                </button>
             )}
 
-            {/* Restoran Sahibi ise Yönetim Paneli */}
             {user.role === 'RestaurantOwner' && (
-               <button onClick={() => navigate('/admin')} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>⚙️ Yönetim</button>
+                <button 
+                    onClick={() => navigate('/admin')} 
+                    style={{ 
+                        background: 'white',       
+                        color: '#ff0000',          
+                        border: '2px solid white', 
+                        padding: '8px 15px', 
+                        borderRadius: '20px', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)' 
+                    }}
+                >
+                    ⚙️ Yönetim
+                </button>
             )}
 
-            <button onClick={handleLogout} style={{ background: '#333', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontSize: '14px' }}>Çıkış</button>
+            <button onClick={handleLogout} style={{ background: '#333', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontSize: '14px', fontWeight:'bold' }}>Çıkış</button>
           </div>
         ) : (
-          <Link to="/login" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', border: '1px solid white', padding: '8px 15px', borderRadius: '5px' }}>🔑 Giriş Yap</Link>
+          <Link to="/login" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', border: '2px solid white', padding: '10px 25px', borderRadius: '30px', fontSize: '16px', transition: '0.3s' }}>
+            🔑 Giriş Yap
+          </Link>
         )}
 
       </div>

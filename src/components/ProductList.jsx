@@ -7,72 +7,102 @@ export default function ProductList() {
   const [products, setProducts] = useState([]);
   const { id } = useParams(); 
   const navigate = useNavigate();
-  
   const { addToCart } = useCart(); 
 
   useEffect(() => {
-    // Backend portun 7197
     axios.get(`https://localhost:7197/api/Products/ByRestaurant/${id}`)
       .then(response => setProducts(response.data))
       .catch(error => console.error(error));
   }, [id]);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <button onClick={() => navigate('/')} style={{ padding: '10px', marginBottom: '20px', cursor: 'pointer' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      
+      <button 
+        onClick={() => navigate('/')} 
+        style={{ 
+            padding: '10px 20px', 
+            marginBottom: '20px', 
+            cursor: 'pointer', 
+            border:'1px solid #ddd', 
+            background:'white', 
+            borderRadius:'8px',
+            fontWeight: '600',
+            color: '#555'
+        }}>
         🔙 Restoranlara Dön
       </button>
 
-      <h2 style={{ textAlign: 'center' }}>Menü</h2>
+      <h2 style={{ textAlign: 'center', color: '#2D3436', marginBottom: '30px' }}>Menü</h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+      {/* 👇 DEĞİŞİKLİK BURADA: 250px YERİNE 340px YAPTIK */}
+      <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', 
+          gap: '25px' 
+      }}>
         {products.map(product => (
-          <div key={product.id} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '10px', background: '#fff' }}>
+          <div key={product.id} style={{ 
+              border: '1px solid #eee', 
+              padding: '25px', // İç boşluğu biraz artırdık ferah olsun
+              borderRadius: '15px', 
+              background: '#fff', 
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '180px' // Kartların boyu eşit dursun diye
+          }}>
             
-            {/* --- DEĞİŞİKLİK BURADA BAŞLIYOR --- */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ margin: 0 }}>{product.name}</h3>
-                
-                {/* Puan Varsa Göster, Yoksa 'YENİ' Yaz */}
-                {product.averageScore > 0 ? (
-                    <span style={{ 
-                        backgroundColor: '#fff3cd', 
-                        color: '#856404', 
-                        padding: '4px 8px', 
-                        borderRadius: '5px', 
-                        fontSize: '14px', 
-                        fontWeight: 'bold',
-                        border: '1px solid #ffeeba'
-                    }}>
-                        ★ {product.averageScore.toFixed(1)}
-                    </span>
-                ) : (
-                    <span style={{ 
-                        backgroundColor: '#28a745', 
-                        color: 'white', 
-                        padding: '4px 8px', 
-                        borderRadius: '5px', 
-                        fontSize: '12px', 
-                        fontWeight: 'bold'
-                    }}>
-                        YENİ
-                    </span>
-                )}
-            </div>
-            {/* --- DEĞİŞİKLİK BURADA BİTİYOR --- */}
+            <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
+                    {/* İsim alanı artık daha geniş */}
+                    <h3 style={{ margin: 0, color: '#2D3436', fontSize: '1.3rem' }}>{product.name}</h3>
+                    
+                    {product.averageScore > 0 ? (
+                        <span style={{ 
+                            backgroundColor: '#fff3cd', 
+                            color: '#FFA502', 
+                            padding: '4px 8px', 
+                            borderRadius: '5px', 
+                            fontSize: '14px', 
+                            fontWeight: 'bold', 
+                            border: '1px solid #ffeeba',
+                            whiteSpace: 'nowrap' // Yıldız aşağı kaymasın
+                        }}>
+                            ★ {product.averageScore.toFixed(1)}
+                        </span>
+                    ) : (
+                        <span style={{ 
+                            backgroundColor: '#2ECC71', 
+                            color: 'white', 
+                            padding: '4px 8px', 
+                            borderRadius: '5px', 
+                            fontSize: '10px', 
+                            fontWeight: 'bold' 
+                        }}>
+                            YENİ
+                        </span>
+                    )}
+                </div>
 
-            <p style={{ color: '#555' }}>{product.description}</p>
+                <p style={{ color: '#636e72', fontSize: '0.95em', lineHeight: '1.5' }}>{product.description}</p>
+            </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px' }}>
-              <b style={{ fontSize: '1.1em', color: '#333' }}>{product.price} TL</b>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px' }}>
+              <b style={{ fontSize: '1.4em', color: '#2D3436' }}>{product.price} TL</b>
               
-              {/* BUTON */}
               <button 
                 onClick={() => addToCart(product)}
                 style={{ 
-                  background: '#ff4d4d', color: 'white', border: 'none', 
-                  padding: '8px 15px', borderRadius: '5px', cursor: 'pointer',
-                  fontWeight: 'bold' 
+                  background: '#2ECC71', 
+                  color: 'white', border: 'none', 
+                  padding: '12px 24px', // Butonu da biraz büyüttük
+                  borderRadius: '8px', 
+                  cursor: 'pointer',
+                  fontWeight: 'bold', 
+                  fontSize: '1rem',
+                  boxShadow: '0 4px 6px rgba(46, 204, 113, 0.3)' 
                 }}
               >
                 Sepete Ekle +
