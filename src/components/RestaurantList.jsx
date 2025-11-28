@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// 👇 1. LOGOYU IMPORT EDİYORUZ
+// LOGOYU IMPORT EDİYORUZ
 import logoImg from '../assets/sitelogo.png';
 
 export default function RestaurantList() {
@@ -18,39 +18,39 @@ export default function RestaurantList() {
 
   return (
     <div>
-      {/* 👇 KIRMIZI BANNER ALANI */}
+      {/* KIRMIZI BANNER */}
       <div style={{ 
         backgroundColor: '#ff0000', 
         color: 'white',
-        padding: '60px 20px',
-        // Flexbox ile yan yana diziyoruz
+        padding: '50px 20px',
         display: 'flex',
-        justifyContent: 'center', // Yatayda ortala
-        alignItems: 'center',     // Dikeyde ortala
-        gap: '30px',              // Logo ile yazı arasındaki boşluk
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '30px', 
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         marginBottom: '40px'
       }}>
         
-        {/* SOL TARAFTAKİ LOGO */}
+        {/* LOGO RESMİ */}
         <img 
             src={logoImg} 
             alt="TıklaYe Logo" 
             style={{ 
-                height: '160px', // Logonun boyutu (Büyükçe)
+                height: '130px', 
                 width: 'auto',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' // Hafif gölge
+                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' 
             }} 
         />
 
-        {/* SAĞ TARAFTAKİ YAZILAR */}
-        <div style={{ textAlign: 'left' }}> {/* Yazıları sola yasladık */}
+        {/* METİN KISMI */}
+        <div style={{ textAlign: 'left' }}>
             <h1 style={{ 
                 margin: 0, 
-                fontSize: '5em', // Yazıyı iyice büyüttük
+                fontSize: '4em', 
                 fontWeight: '800',
                 fontFamily: "'Poppins', sans-serif",
+                letterSpacing: '2px',
                 lineHeight: '1',
                 textShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}>
@@ -58,7 +58,7 @@ export default function RestaurantList() {
             </h1>
             <p style={{ 
                 margin: '10px 0 0 5px', 
-                fontSize: '2em', 
+                fontSize: '1.8em', 
                 fontWeight: '400',
                 opacity: 0.95,
                 fontFamily: "'Poppins', sans-serif",
@@ -110,8 +110,14 @@ export default function RestaurantList() {
             e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.05)';
           }}
           >
+            {/* 👇 DÜZELTME BURADA: Backend'den gelen resmi kullanıyoruz */}
             <div style={{ marginBottom: '20px', background: '#fff5f5', padding: '20px', borderRadius: '50%' }}>
-                <img src="https://cdn-icons-png.flaticon.com/512/4359/4359642.png" alt="Restoran İkon" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                <img 
+                    // imageUrl varsa onu kullan, yoksa varsayılanı kullan (küçük harfle başladığına dikkat et)
+                    src={restaurant.imageUrl || "https://cdn-icons-png.flaticon.com/512/4359/4359642.png"} 
+                    alt={restaurant.name} 
+                    style={{ width: '60px', height: '60px', objectFit: 'contain' }} 
+                />
             </div>
 
             <h3 style={{ margin: '10px 0', color: '#2D3436', fontSize: '1.5em' }}>{restaurant.name}</h3>
