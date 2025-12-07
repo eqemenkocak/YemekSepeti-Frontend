@@ -9,8 +9,6 @@ export default function ProductList() {
   const { id } = useParams(); 
   const navigate = useNavigate();
   const { addToCart } = useCart(); 
-  
-  // 👇 openSidebar fonksiyonunu da çektik
   const { toggleFavorite, isFavorite, openSidebar } = useFavorites(); 
 
   useEffect(() => {
@@ -19,11 +17,8 @@ export default function ProductList() {
       .catch(error => console.error(error));
   }, [id]);
 
-  // Kalp butonuna basılınca çalışacak özel fonksiyon
   const handleFavoriteClick = (product) => {
-    toggleFavorite(product); // 1. Favorilere ekle/çıkar
-    
-    // 2. Eğer ürün favorilerde YOKSA (yani yeni ekleniyorsa) paneli aç
+    toggleFavorite(product); 
     if (!isFavorite(product.id)) {
         openSidebar();
     }
@@ -68,9 +63,8 @@ export default function ProductList() {
               position: 'relative'
           }}>
             
-            {/* 👇 GÜNCELLENEN KALP BUTONU */}
             <button 
-                onClick={() => handleFavoriteClick(product)} // Yeni fonksiyonu bağladık
+                onClick={() => handleFavoriteClick(product)} 
                 style={{ 
                     position: 'absolute', 
                     top: '15px', 
@@ -98,11 +92,21 @@ export default function ProductList() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px', paddingRight: '40px' }}>
                     <h3 style={{ margin: 0, color: '#2D3436', fontSize: '1.3rem' }}>{product.name}</h3>
                     
+                    {/* 👇 PUAN GÖSTERGESİ (GÜNCELLENDİ) */}
                     {product.averageScore > 0 ? (
                         <span style={{ 
-                            backgroundColor: '#fff3cd', color: '#FFA502', padding: '4px 8px', borderRadius: '5px', fontSize: '14px', fontWeight: 'bold', border: '1px solid #ffeeba', whiteSpace: 'nowrap'
+                            backgroundColor: product.averageScore < 3.5 ? '#ff7675' : '#fff3cd', // Düşükse Kırmızı, İyiyse Sarı
+                            color: product.averageScore < 3.5 ? 'white' : '#FFA502', 
+                            padding: '4px 8px', 
+                            borderRadius: '5px', 
+                            fontSize: '14px', 
+                            fontWeight: 'bold', 
+                            border: product.averageScore < 3.5 ? '1px solid #d63031' : '1px solid #ffeeba',
+                            whiteSpace: 'nowrap',
+                            display: 'flex', alignItems: 'center', gap: '5px'
                         }}>
-                            ★ {product.averageScore.toFixed(1)}
+                            {/* Düşükse Ünlem, İyiyse Yıldız */}
+                            {product.averageScore < 3.5 ? '⚠️' : '★'} {product.averageScore.toFixed(1)}
                         </span>
                     ) : (
                         <span style={{ backgroundColor: '#2ECC71', color: 'white', padding: '4px 8px', borderRadius: '5px', fontSize: '10px', fontWeight: 'bold' }}>YENİ</span>

@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 export default function AdminPanel() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
-  const navigate = useNavigate();
+  // 👇 1. İSTATİSTİK STATE'İ (Başlangıçta hepsi 0)
+  const [stats, setStats] = useState({ revenue: 0, orderCount: 0, productCount: 0 });
   
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
   // Yeni yemek ekleme state'leri
@@ -21,8 +23,10 @@ export default function AdminPanel() {
         navigate('/login');
         return;
     }
+
     fetchOrders();
     fetchProducts();
+    fetchStats(); // 👇 2. İSTATİSTİKLERİ ÇEK
   }, []);
 
   const fetchOrders = () => {
@@ -37,11 +41,19 @@ export default function AdminPanel() {
       .catch(err => console.error(err));
   };
 
+  // 👇 3. İSTATİSTİK ÇEKEN FONKSİYON
+  const fetchStats = () => {
+    axios.get(`https://localhost:7197/api/Restaurants/Stats/${user.restaurantId}`)
+      .then(res => setStats(res.data))
+      .catch(err => console.error("İstatistik hatası:", err));
+  };
+
   const handleStatusUpdate = (id, newStatus) => {
     axios.put(`https://localhost:7197/api/Orders/UpdateStatus/${id}`, { status: newStatus })
       .then(() => {
         alert("Durum güncellendi!");
         fetchOrders();
+        fetchStats(); // Durum değişince ciroyu da güncelle
       })
       .catch(err => alert("Hata oluştu!"));
   };
@@ -60,6 +72,7 @@ export default function AdminPanel() {
             alert("Yemek eklendi!");
             setNewProduct({ name: '', price: '', description: '' });
             fetchProducts();
+            fetchStats(); // Ürün sayısını güncelle
         })
         .catch(err => alert("Ekleme başarısız!"));
   };
@@ -67,7 +80,10 @@ export default function AdminPanel() {
   const handleDeleteProduct = (id) => {
       if(window.confirm("Bu ürünü silmek istediğine emin misin?")) {
           axios.delete(`https://localhost:7197/api/Products/${id}`)
-              .then(() => { fetchProducts(); })
+              .then(() => {
+                  fetchProducts();
+                  fetchStats(); // Ürün sayısını güncelle
+              })
               .catch(err => alert("Silinemedi!"));
       }
   };
@@ -86,6 +102,30 @@ export default function AdminPanel() {
              </button>
         </div>
       </div>
+
+      {/* 👇 4. DASHBOARD (ÖZET KUTULARI) - YENİ EKLENDİ */}
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+          
+          {/* Ciro Kutusu */}
+          <div style={{ flex: 1, background: 'linear-gradient(135deg, #00b894, #55efc4)', color: 'white', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,184,148,0.3)', textAlign: 'center' }}>
+              <div style={{ fontSize: '3em', fontWeight: 'bold' }}>{stats.revenue} ₺</div>
+              <div style={{ fontSize: '1.2em', opacity: 0.9 }}>💰 Toplam Ciro</div>
+          </div>
+
+          {/* Sipariş Sayısı Kutusu */}
+          <div style={{ flex: 1, background: 'linear-gradient(135deg, #0984e3, #74b9ff)', color: 'white', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 15px rgba(9,132,227,0.3)', textAlign: 'center' }}>
+              <div style={{ fontSize: '3em', fontWeight: 'bold' }}>{stats.orderCount}</div>
+              <div style={{ fontSize: '1.2em', opacity: 0.9 }}>📦 Toplam Sipariş</div>
+          </div>
+
+          {/* Ürün Sayısı Kutusu */}
+          <div style={{ flex: 1, background: 'linear-gradient(135deg, #fdcb6e, #ffeaa7)', color: '#d35400', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 15px rgba(253,203,110,0.3)', textAlign: 'center' }}>
+              <div style={{ fontSize: '3em', fontWeight: 'bold' }}>{stats.productCount}</div>
+              <div style={{ fontSize: '1.2em', opacity: 0.9 }}>🍔 Menüdeki Yemekler</div>
+          </div>
+
+      </div>
+      {/* ------------------------------------------------ */}
 
       <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
         
@@ -115,64 +155,38 @@ export default function AdminPanel() {
         {/* SAĞ KOLON: SİPARİŞLER */}
         <div style={{ flex: 2 }}>
             <h3 style={{ marginTop: 0 }}>📦 Gelen Siparişler</h3>
-            
             {orders.length === 0 ? <p>Henüz sipariş yok.</p> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     {orders.map(order => (
                         <div key={order.id} style={{ background: 'white', padding: '20px', borderRadius: '10px', borderLeft: '5px solid #0984e3', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                            
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.1em' }}>Sipariş #{order.id}</span>
                                 <span style={{ color: 'green', fontWeight: 'bold' }}>{order.totalAmount} TL</span>
                             </div>
-
                             <div style={{ backgroundColor: '#f1f2f6', padding: '10px', borderRadius: '5px', marginBottom: '10px', fontSize: '0.9em' }}>
                                 <div>👤 <b>Müşteri:</b> {order.customerName}</div>
                                 <div style={{ marginTop: '5px' }}>📍 <b>Adres:</b> {order.addressText}</div>
                             </div>
+                            
+                            <div style={{ fontSize: '0.9em', color: '#555', marginTop: '5px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                💳 <b>Ödeme:</b> <span style={{ backgroundColor: '#e8f0fe', padding: '2px 8px', borderRadius: '4px', color: '#2980b9', fontWeight: 'bold' }}>{order.paymentMethod || "Belirtilmemiş"}</span>
+                            </div>
 
-                            {/* --- İÇERİK VE PUAN GÖSTERİMİ (GÜNCELLENDİ) --- */}
-                            <div style={{ marginBottom: '15px' }}>
+                            <div style={{ marginBottom: '15px', marginTop:'10px' }}>
                                 <div style={{ color: '#636e72', marginBottom: '5px' }}>🍽️ <b>İçerik:</b></div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                     {order.items.map((item, idx) => (
-                                        <div key={idx} style={{ 
-                                            border: '1px solid #eee', 
-                                            padding: '5px 10px', 
-                                            borderRadius: '15px', 
-                                            backgroundColor: '#fff',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '5px',
-                                            fontSize: '0.9em'
-                                        }}>
+                                        <div key={idx} style={{ border: '1px solid #eee', padding: '5px 10px', borderRadius: '15px', backgroundColor: '#fff', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9em' }}>
                                             <span>{item.name}</span>
-                                            {/* Eğer Puan Varsa (0'dan büyükse) Göster */}
-                                            {item.score > 0 && (
-                                                <span style={{ 
-                                                    backgroundColor: '#ffeaa7', 
-                                                    color: '#d35400', 
-                                                    padding: '2px 6px', 
-                                                    borderRadius: '10px', 
-                                                    fontWeight: 'bold',
-                                                    fontSize: '0.85em'
-                                                }}>
-                                                    ★ {item.score}
-                                                </span>
-                                            )}
+                                            {item.score > 0 && <span style={{ backgroundColor: '#ffeaa7', color: '#d35400', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold', fontSize: '0.85em' }}>★ {item.score}</span>}
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            {/* ---------------------------------------------- */}
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <span style={{ fontSize: '0.9em' }}>Durum:</span>
-                                <select 
-                                    value={order.status} 
-                                    onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
-                                    style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ddd', flex: 1 }}
-                                >
+                                <select value={order.status} onChange={(e) => handleStatusUpdate(order.id, e.target.value)} style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ddd', flex: 1 }}>
                                     <option value="Bekleniyor...">⏳ Bekleniyor...</option>
                                     <option value="Hazırlanıyor">🔥 Hazırlanıyor</option>
                                     <option value="Yola Çıktı">🛵 Yola Çıktı</option>
@@ -180,7 +194,6 @@ export default function AdminPanel() {
                                     <option value="İptal Edildi">❌ İptal Edildi</option>
                                 </select>
                             </div>
-
                         </div>
                     ))}
                 </div>

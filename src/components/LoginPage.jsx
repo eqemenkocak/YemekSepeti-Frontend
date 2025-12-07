@@ -5,19 +5,16 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  // --- GİRİŞ STATE ---
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
-  // --- KAYIT STATE (ADRES EKLENDİ) ---
   const [registerData, setRegisterData] = useState({ 
     fullName: '', 
     email: '', 
     password: '', 
     phone: '',
-    address: '' // 👈 Yeni alan
+    address: '' 
   });
 
-  // GİRİŞ FONKSİYONU
   const handleLogin = () => {
     axios.post('https://localhost:7197/api/Auth/login', loginData)
       .then(res => {
@@ -27,10 +24,16 @@ export default function LoginPage() {
       .catch(() => alert("Giriş Başarısız! Şifre veya Email yanlış."));
   };
 
-  // KAYIT FONKSİYONU
   const handleRegister = () => {
-    if(!registerData.fullName || !registerData.email || !registerData.password) {
-        alert("Lütfen zorunlu alanları doldurun!");
+    // 1. Boş Alan Kontrolü
+    if(!registerData.fullName || !registerData.email || !registerData.password || !registerData.address) {
+        alert("Lütfen tüm alanları doldurun!");
+        return;
+    }
+
+    // 2. Telefon Numarası Kontrolü (11 Hane)
+    if (registerData.phone.length !== 11) {
+        alert("Telefon numarası başında 0 olacak şekilde tam 11 hane olmalıdır! (Örn: 0555...)");
         return;
     }
 
@@ -40,7 +43,9 @@ export default function LoginPage() {
         setRegisterData({ fullName: '', email: '', password: '', phone: '', address: '' });
       })
       .catch(err => {
-        alert(err.response?.data?.message || "Kayıt olurken bir hata oluştu.");
+        // 👇 BACKEND'DEN GELEN "ZATEN KAYITLI" MESAJINI BURADA GÖSTERİYORUZ
+        const errorMessage = err.response?.data?.message || "Kayıt olurken bir hata oluştu.";
+        alert("❌ HATA: " + errorMessage);
       });
   };
 
@@ -54,7 +59,7 @@ export default function LoginPage() {
         flexWrap: 'wrap'
     }}>
 
-      {/* SOL KUTU: GİRİŞ YAP (Değişmedi) */}
+      {/* SOL KUTU: GİRİŞ YAP */}
       <div style={{ background: 'white', padding: '40px', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', width: '350px', textAlign: 'center' }}>
         <h2 style={{ color: '#333', marginBottom: '20px' }}>🔐 Giriş Yap</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -64,7 +69,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* SAĞ KUTU: KAYIT OL (Adres Eklendi) */}
+      {/* SAĞ KUTU: KAYIT OL */}
       <div style={{ 
           background: 'white', 
           padding: '40px', 
@@ -89,14 +94,19 @@ export default function LoginPage() {
                 onChange={e => setRegisterData({...registerData, email: e.target.value})}
                 style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
             />
+            
             <input 
-                placeholder="Telefon" 
+                type="tel"
+                placeholder="Telefon (05...)" 
                 value={registerData.phone}
-                onChange={e => setRegisterData({...registerData, phone: e.target.value})}
+                maxLength={11} 
+                onChange={e => {
+                    const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                    setRegisterData({...registerData, phone: onlyNums});
+                }}
                 style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
             />
             
-            {/* 👇 YENİ ADRES KUTUSU */}
             <textarea 
                 placeholder="Açık Adres (Sipariş için)" 
                 value={registerData.address}
